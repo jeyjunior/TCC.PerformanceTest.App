@@ -11,7 +11,6 @@ namespace InfraData.Context
 {
     public class DbSession : IDisposable
     {
-        private const string DbLocalFile = "config_tcc.db";
         public IDbConnection Connection { get; }
 
         public DbSession(string sqlServerConectionString)
@@ -22,9 +21,10 @@ namespace InfraData.Context
 
         public DbSession()
         {
-            string connectionString = $"Data Source={DbLocalFile};Version=3;";
-            if (!System.IO.File.Exists(DbLocalFile))
-                SQLiteConnection.CreateFile(DbLocalFile);
+            string dbFile = "config.db";
+            string connectionString = $"Data Source={dbFile};Version=3;";
+            if (!System.IO.File.Exists(dbFile))
+                SQLiteConnection.CreateFile(dbFile);
 
             Connection = new SQLiteConnection(connectionString);
             Connection.Open();

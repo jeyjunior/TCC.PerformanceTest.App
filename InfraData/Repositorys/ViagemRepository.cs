@@ -16,16 +16,7 @@ namespace InfraData.Repositorys
         {
 
         }
-        public IEnumerable<Viagem> GerarDados(int quantidade)
-        {
-            var faker = new Faker<Viagem>("pt_BR")
-            .RuleFor(v => v.Destino, f => f.Address.City() + ", " + f.Address.Country())
-            .RuleFor(v => v.DataInicio, f => f.Date.Between(new DateTime(2020, 1, 1), new DateTime(2030, 12, 31)))
-            .RuleFor(v => v.DataFim, (f, v) => v.DataInicio.AddDays(f.Random.Int(1, 30)))
-            .RuleFor(v => v.Observacoes, f => f.Lorem.Paragraphs(1));
 
-            return faker.Generate(quantidade);
-        }
         public void AdicionarEmLote(List<Viagem> viagens, bool transacionar = false)
         {
             string sql = @"INSERT INTO [dbo].[Viagem] ([Destino], [DataInicio], [DataFim], [Observacoes]) 

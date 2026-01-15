@@ -33,7 +33,7 @@ namespace InfraData.Repositorys
         {
             string sql = @"INSERT   INTO    Parametro (FK_Ambiente, Descricao, StringConexao) 
                            VALUES   (@FK_Ambiente, @Descricao, @StringConexao)";
-            _session.Connection.Execute(sql, param);
+            var ret = _session.Connection.Execute(sql, param);
         }
 
         public void Atualizar(Parametro param)
@@ -46,18 +46,18 @@ namespace InfraData.Repositorys
             _session.Connection.Execute(sql, param);
         }
 
-        public void Excluir(int id)
+        public void Excluir(int pK_Parametro)
         {
             string sql = "DELETE FROM Parametro WHERE PK_Parametro = @PK_Parametro";
-            _session.Connection.Execute(sql, new { Id = id });
+            _session.Connection.Execute(sql, new { PK_Parametro = pK_Parametro });
         }
 
-        public IEnumerable<Parametro> ObterTodos()
+        public IEnumerable<Parametro> ObterLista()
         {
             return _session.Connection.Query<Parametro>("SELECT * FROM Parametro");
         }
 
-        public Parametro ObterPorId(int pK_Parametro)
+        public Parametro Obter(int pK_Parametro)
         {
             return _session.Connection.QueryFirstOrDefault<Parametro>("SELECT * FROM Parametro WHERE PK_Parametro = @PK_Parametro", new { PK_Parametro = pK_Parametro });
         }

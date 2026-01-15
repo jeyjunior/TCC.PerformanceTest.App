@@ -8,7 +8,7 @@ namespace Domain.Enumerators
 {
     public enum eTipoAmbiente
     {
-        BaseResultados = 0,
+        Base_Resultados = 0,
         Teste_OnPremise = 1,
         Teste_Cloud = 2,
     }
