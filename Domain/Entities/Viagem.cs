@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Presentation
+namespace Domain.Entities
 {
     public class Viagem
     {
-        // public int PK_Viagem { get; set; }
+        public int PK_Viagem { get; set; }
         public string Destino { get; set; }
         public DateTime DataInicio { get; set; }
         public DateTime DataFim { get; set; }
