@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Domain.Dtos;
+using Domain.Entities;
 using Domain.Enumerators;
 using InfraData.Repositorys;
 using System;
@@ -24,6 +25,7 @@ namespace Presentation
         private eOperacao _operacaoAtual = eOperacao.Nenhuma;
         private Parametro _parametroSelecionado = null;
         private IEnumerable<Parametro> _parametroCollection = null;
+        private List<Item> ambientes = new List<Item>();
         #endregion
 
         #region Construtor
@@ -72,7 +74,7 @@ namespace Presentation
                         PK_Parametro = 0,
                         Descricao = txtDescricao.Text,
                         StringConexao = txtString.Text,
-                        FK_Ambiente = (int)((eTipoAmbiente)cboAmbiente.SelectedItem)
+                        FK_Ambiente = Convert.ToInt32(cboAmbiente.SelectedValue.ToString())
                     };
 
                     _parametroRepository.Adicionar(_parametroSelecionado);
@@ -82,7 +84,7 @@ namespace Presentation
 
                     _parametroSelecionado.Descricao = txtDescricao.Text;
                     _parametroSelecionado.StringConexao = txtString.Text;
-                    _parametroSelecionado.FK_Ambiente = (int)((eTipoAmbiente)cboAmbiente.SelectedIndex);
+                    _parametroSelecionado.FK_Ambiente = Convert.ToInt32(cboAmbiente.SelectedValue.ToString());
 
                     _parametroRepository.Atualizar(_parametroSelecionado);
 
@@ -121,14 +123,23 @@ namespace Presentation
 
             txtDescricao.Text = _parametroSelecionado.Descricao;
             txtString.Text = _parametroSelecionado.StringConexao;
-            cboAmbiente.SelectedItem = (eTipoAmbiente)_parametroSelecionado.FK_Ambiente;
+            cboAmbiente.SelectedValue = _parametroSelecionado.FK_Ambiente;
         }
         #endregion
 
         #region Metodos
         private void CarregarComboBoxAmbiente()
         {
-            cboAmbiente.DataSource = Enum.GetValues(typeof(eTipoAmbiente));
+            ambientes = new List<Item>
+            {
+                new Item { ID = 1, Descricao = "Base Resultados" },
+                new Item { ID = 2, Descricao = "OnPremise" },
+                new Item { ID = 3, Descricao = "Cloud" },
+            };
+
+            cboAmbiente.DataSource = ambientes;
+            cboAmbiente.DisplayMember = "Descricao";
+            cboAmbiente.ValueMember = "ID";
         }
         private void Bind()
         {
@@ -138,7 +149,7 @@ namespace Presentation
             var itens = _parametroCollection.Select(i => new 
             {
                 PK_Parametro = i.PK_Parametro,
-                Ambiente = ((eTipoAmbiente)i.FK_Ambiente).ToString(),
+                Ambiente = ambientes.FirstOrDefault(a => a.ID == i.FK_Ambiente).Descricao,
                 Descricao = i.Descricao,
                 Conexao = i.StringConexao,
             }).ToList();

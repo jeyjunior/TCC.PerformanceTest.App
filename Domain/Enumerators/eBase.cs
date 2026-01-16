@@ -6,13 +6,6 @@ using System.Threading.Tasks;
 
 namespace Domain.Enumerators
 {
-    public enum eTipoAmbiente
-    {
-        Base_Resultados = 0,
-        Teste_OnPremise = 1,
-        Teste_Cloud = 2,
-    }
-
     public enum eOperacao
     {
         Nenhuma = 0,

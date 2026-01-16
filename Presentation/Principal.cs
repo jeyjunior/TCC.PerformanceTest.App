@@ -1,4 +1,11 @@
-﻿using System;
+﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
+using Domain.Entities;
+using Domain.Enumerators;
+using Domain.Extension;
+using InfraData.Repositorys;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,11 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using BenchmarkDotNet.Running;
-using Domain.Entities;
-using Domain.Enumerators;
-using Domain.Extension;
-using InfraData.Repositorys;
+using System.Windows.Forms.Design;
 
 namespace Presentation
 {
@@ -95,15 +98,82 @@ namespace Presentation
                 return;
             }
         }
-        private void btnBenchmark_Click(object sender, EventArgs e)
+        private async void btnBenchmark_Click(object sender, EventArgs e)
         {
+            // 1. Validações básicas
             if (_iDsSelecionado.Count <= 0)
             {
-                MessageBox.Show("É preciso marcar pelo menos uma conexão para teste.");
+                MessageBox.Show("Selecione uma conexão.");
                 return;
             }
+
+            // 2. Prepara a lista do Grid
+            var listaParaGrid = new List<dynamic>(); // Usando dynamic pra não precisar criar classe DTO agora
+
+            // Pega os parametros selecionados
+            var conexoes = _parametroCollection
+                .Where(p => _iDsSelecionado.Contains(p.PK_Parametro))
+                .ToList();
+
+            int qtd = (int)txtQuantidadeRegistros.Value;
+
+            lblStatus.Text = "Rodando...";
+            btnBenchmark.Enabled = false;
+
+            try
+            {
+                // Roda em uma Task para não travar a tela
+                foreach (var param in conexoes)
+                {
+                    // --- A MÁGICA SIMPLES ---
+                    // 1. Passa os dados direto para a classe estática
+                    TesteSimplesBenchmark.ConexaoAtual = param.StringConexao;
+                    TesteSimplesBenchmark.QuantidadeAtual = qtd;
+                    Summary summary = null;
+#if DEBUG
+
+                    summary = BenchmarkRunner.Run<TesteSimplesBenchmark>(new DebugInProcessConfig());
+#else
+                        BenchmarkRunner.Run<TesteSimplesBenchmark>();
+#endif
+
+                    // 3. Extrai o resultado na marra
+                    if (summary.Reports.Any())
+                    {
+                        var report = summary.Reports.Where(i => i.ResultStatistics != null).First();
+
+                        // Se deu erro no SQL, o ResultStatistics vem nulo
+                        if (report.ResultStatistics == null) 
+                            continue;
+
+                        var resultado = new
+                        {
+                            Conexao = param.Descricao,
+                            TempoMs = report.ResultStatistics.Mean / 1_000_000.0, // Converte nanossegundos para ms
+                            MemoriaBytes = report.GcStats.GetTotalAllocatedBytes(true), // Pega memória
+                            Gen2 = report.GcStats.Gen2Collections // Pega Garbage Collector
+                        };
+
+                        listaParaGrid.Add(resultado);
+                    }
+                }
+
+                // Exibe no Grid
+                dtgResultado.DataSource = null;
+                dtgResultado.DataSource = listaParaGrid;
+
+                lblStatus.Text = "Finalizado.";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Deu ruim: {ex.Message}");
+            }
+            finally
+            {
+                btnBenchmark.Enabled = true;
+            }
         }
-        #endregion
+#endregion
 
         #region Metodos
         private void BindParametrosConexao()

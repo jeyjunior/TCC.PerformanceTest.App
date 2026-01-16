@@ -13,5 +13,6 @@ namespace Domain.Entities
         public DateTime DataInicio { get; set; }
         public DateTime DataFim { get; set; }
         public string Observacoes { get; set; }
+        public DateTime DataCadastro { get; set; } = DateTime.Now;
     }
 }

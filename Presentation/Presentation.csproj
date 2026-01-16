@@ -211,6 +211,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TesteSimplesBenchmark.cs" />
     <EmbeddedResource Include="Parametros.resx">
       <DependentUpon>Parametros.cs</DependentUpon>
     </EmbeddedResource>
@@ -253,6 +254,10 @@
     <ProjectReference Include="..\InfraData\InfraData.csproj">
       <Project>{B3836F03-8851-407F-B608-8F72E7198604}</Project>
       <Name>InfraData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Services\Services.csproj">
+      <Project>{f64389fb-fdea-4dc9-b7f2-1ec9bf88d08c}</Project>
+      <Name>Services</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
